@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+</head>
+<body onkeydown="getCommand();">
+<h1>hmtl5坦克大战</h1>
+<canvas id="tankMap" width="400px" height="300px" style="background-color:black"></canvas>
+<span id="data">数据</span>
+<script type="text/javascript" src="js/tankGame.js"></script>
+<script type="text/javascript">
+	var canvas1=document.getElementById("tankMap");
+	var cxt=canvas1.getContext("2d");
+	
+
+	//我的坦克 myself  定义子弹数组
+	var myself=new myself(140,140,0,myselfColor);
+	var myselfBullets=new Array();
+	//定义敌人的坦克     子弹的数组
+	var enemyTanks=new Array();
+	var enemyBullets=new Array();
+	//定义一个炸弹数组(可以存放很多炸弹,)
+	var bombs=new Array();
+	//0->上, 1->右, 2->下 3->左
+	//怎样将敌人的坦克设置成为变量然后随机产生？
+	for(var i=0;i<5;i++){
+		
+		//创建一个坦克并把这个坦克放入数组
+		var enemyTank=new EnemyTank((i+1)*50,0,2,enmeyColor);
+		enemyTanks[i]=enemyTank;
+		//启动这个敌人的坦克
+		window.setInterval("enemyTanks["+i+"].run()",50);
+		//当创建敌人坦克时就分配子弹
+		var eb=new Bullet(enemyTanks[i].x+9,enemyTanks[i].y+30,2,1.2,"enemy",enemyTanks[i]);
+		enemyBullets[i]=eb;
+		//启动该子弹
+		var ettimer=window.setInterval("enemyBullets["+i+"].run()",50);
+		enemyBullets[i].timer=ettimer;
+		
+	}
+		//先调用一次
+		flashTankMap();
+	function flashTankMap(){
+		cxt.clearRect(0,0,400,300); 
+		//我的坦克
+
+		drawTank(myself);
+        drawmyselfBullet();
+		//敌人的坦克
+		//判断一下敌人坦克是否被击中
+		isHitEnemyTank();
+		drawtankBomb();
+		drawEnemyBullet();		
+		//画出所有敌人坦克
+		for(var i=0;i<5;i++){
+			drawTank(enemyTanks[i]);
+		}
+		//判断自己的坦克是否被击中，击中了执行该函数
+		isHitmyselfTank();
+		drawtankBomb();
+			
+	}
+
+	function getCommand(){
+		if(myself.life>0){     //确保坦克是在活着的时候才能射击
+		var code=event.keyCode;//对应字母的ascii码->看码表		
+		switch(code){
+			case 87://上
+				myself.moveUp();				
+			    break;
+			case 68:			
+			    myself.moveRight();
+			    break;
+			 case 83:
+				myself.moveDown();
+				break;
+			case 65:
+				myself.moveLeft();
+				break;
+			case 74:
+				myself.shotEnemy();
+				break;
+		}
+		flashTankMap();
+		}
+	}	
+	//每隔100毫秒去刷新一次作战区
+	window.setInterval("flashTankMap()",100);
+
+</script>
+</body>
+</html>
